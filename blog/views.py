@@ -9,6 +9,16 @@ from .forms import CommentForm
 
 
 class PostList(generic.ListView):
+    """
+    Displays a list of published blog posts.
+
+    **Context**
+    ``post_list``
+        A list of instances of :model:`blog.Post` with status 1 (published).
+
+    **Template:**
+    :template:`blog/index.html`
+    """
     queryset = Post.objects.filter(status=1)
     template_name = "blog/index.html"
     paginate_by = 6
@@ -34,7 +44,6 @@ def post_detail(request, slug):
     comment_count = post.comments.filter(approved=True).count()
 
     if request.method == "POST":
-        print("Received a POST request")
         comment_form = CommentForm(data=request.POST)
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
@@ -47,7 +56,6 @@ def post_detail(request, slug):
             )
 
     comment_form = CommentForm()
-    print("About to render template")
 
     return render(
         request,
@@ -62,7 +70,16 @@ def post_detail(request, slug):
 
 def comment_edit(request, slug, comment_id):
     """
-    view to edit comments
+    Edit an individual comment.
+
+    Allows editing of a comment related to a specific blog post.
+
+    **Context**
+
+    ``post``
+        An instance of :model:`blog.Post`.
+    ``comment``
+        The comment being edited.
     """
     if request.method == "POST":
 
@@ -84,7 +101,14 @@ def comment_edit(request, slug, comment_id):
 
 def comment_delete(request, slug, comment_id):
     """
-    view to delete comment
+    Delete an individual comment.
+
+    **Context**
+
+    ``post``
+        An instance of :model:`blog.Post`.
+    ``comment``
+        A single comment re;ated to the post.
     """
     queryset = Post.objects.filter(status=1)
     post = get_object_or_404(queryset, slug=slug)
